@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Puzzle Game</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        const config = {
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            backgroundColor: '#1e1e2f',
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: { y: 0 },
+                    debug: false
+                }
+            },
+            scene: {
+                preload: preload,
+                create: create,
+                update: update
+            }
+        };
+
+        const game = new Phaser.Game(config);
+        let player;
+        let cursors;
+        let resource;
+        let score = 0;
+        let scoreText;
+
+        function preload() {
+            // تحميل الصور
+            this.load.image('player', 'https://via.placeholder.com/32x32/4caf50/ffffff?text=P'); // صورة اللاعب
+            this.load.image('resource', 'https://via.placeholder.com/32x32/ff5722/ffffff?text=R'); // صورة المورد
+            this.load.image('background', 'https://via.placeholder.com/800x600/303F9F/ffffff'); // الخلفية
+        }
+
+        function create() {
+            // إضافة الخلفية
+            this.add.image(400, 300, 'background');
+
+            // إنشاء اللاعب
+            player = this.physics.add.sprite(100, 300, 'player');
+            player.setCollideWorldBounds(true);
+
+            // إنشاء المورد
+            resource = this.physics.add.sprite(700, 300, 'resource');
+
+            // إضافة الكشف عن التصادم
+            this.physics.add.overlap(player, resource, collectResource, null, this);
+
+            // عرض النقاط
+            scoreText = this.add.text(16, 16, 'Score: 0', {
+                fontSize: '24px',
+                fill: '#ffffff'
+            });
+
+            // إعداد مفاتيح التحكم
+            cursors = this.input.keyboard.createCursorKeys();
+        }
+
+        function update() {
+            // إعادة تعيين سرعة اللاعب
+            player.setVelocity(0);
+
+            // تحريك اللاعب بناءً على الأسهم
+            if (cursors.left.isDown) {
+                player.setVelocityX(-200);
+            } else if (cursors.right.isDown) {
+                player.setVelocityX(200);
+            }
+
+            if (cursors.up.isDown) {
+                player.setVelocityY(-200);
+            } else if (cursors.down.isDown) {
+                player.setVelocityY(200);
+            }
+        }
+
+        function collectResource(player, resource) {
+            resource.disableBody(true, true); // إخفاء المورد
+            score += 10; // تحديث النقاط
+            scoreText.setText('Score: ' + score); // تحديث عرض النقاط
+            alert('You collected the resource!'); // إشعار اللاعب
+        }
+    </script>
+</body>
+</html>
